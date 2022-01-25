@@ -1,7 +1,7 @@
 name: Rust Tests
 on: push
 jobs:
-  tests:
+  Rust_tests:
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest]
