@@ -1,2 +1,3 @@
 target/
 .near-credentials/
+node_modules

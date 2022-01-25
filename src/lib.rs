@@ -42,8 +42,9 @@ impl VIPList {
             .map(|list| list.insert(account_id, allowance.into()));
     }
 
-    pub fn vip_allowance(&self, account_id: AccountId) -> Option<U128> {
-        self.get_current_list()
+    pub fn vip_allowance(&self, list_id: Option<AccountId>, account_id: AccountId) -> Option<U128> {
+      let list_id = list_id.unwrap_or_else(|| env::predecessor_account_id());
+      self.lists.get(&list_id)
             .and_then(|list| list.get(&account_id).map(|allowance| (*allowance).into()))
     }
 
