@@ -2802,8 +2802,7 @@ dependencies = [
 [[package]]
 name = "workspaces"
 version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f46b5b989c75d33dad4dfee4a5e402d87cae8f72129fe6d0126800883c2b83b"
+source = "git+https://github.com/near/workspaces-rs?rev=e3273f79d86b9a927b5ce6bd16c5f01f781fb741#e3273f79d86b9a927b5ce6bd16c5f01f781fb741"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2826,6 +2825,7 @@ dependencies = [
  "serde_json",
  "tokio",
  "tokio-retry",
+ "tracing",
  "url",
 ]
 

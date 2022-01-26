@@ -1,7 +1,4 @@
-use near_sdk::{
-    json_types::U128,
-    serde_json::{self, json},
-};
+use near_sdk::{json_types::U128, serde_json::json};
 use tokio::fs;
 use workspaces::prelude::*;
 
@@ -11,51 +8,48 @@ async fn workspaces_test() -> anyhow::Result<()> {
 
     let worker = workspaces::sandbox();
     let root = worker.root_account();
+    let alice = root
+        .create_subaccount(&worker, "alice")
+        .transact()
+        .await?
+        .into_result()?;
 
-    let args = json!({
-        "owner_id": root.id(),
-    })
-    .to_string();
-
-    let contract = worker.dev_deploy(wasm).await?;
+    let contract = worker.dev_deploy(&wasm).await?;
     // No failures
-    let res = contract
+    contract
         .call(&worker, "new")
-        .args(args.into_bytes())
+        .args_json(json!({
+            "owner_id": root.id(),
+        }))?
         .transact()
         .await?;
 
-    // res.json()?;
-
-    let res = contract
-        .call(&worker, "add_list")
+    root
+        .call(&worker, contract.id(), "add_list")
         .args_json(json!({
             "account_id": root.id(),
         }))?
         .transact()
         .await?;
 
-    println!("{:#?}", res);
-
-    let res = contract
-        .call(&worker, "add_to_list")
+    root
+        .call(&worker, contract.id(), "add_to_list")
         .args_json(json!({
-            "account_id": root.id(),
+            "account_id": alice.id(),
             "allowance": U128::from(42)
         }))?
         .transact()
         .await?;
 
-    println!("{:#?}", res);
-
     let res = contract
         .call(&worker, "vip_allowance")
         .args_json(json!({
-            "account_id": root.id(),
+            "account_id": alice.id(),
+            "list_id": root.id(),
         }))?
         .transact()
         .await?;
-    println!("{:#?}", res.json()?);
+    assert_eq!("42", res.json::<String>()?);
 
     Ok(())
 }
