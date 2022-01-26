@@ -1,8 +1,8 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::json_types::U128;
 use near_sdk::store::{LookupMap, UnorderedMap};
+use near_sdk::BorshStorageKey;
 use near_sdk::{env, near_bindgen, AccountId, PanicOnDefault};
-use near_sdk::{BorshStorageKey};
 
 #[derive(BorshSerialize, BorshStorageKey)]
 enum StorageKey {
@@ -19,7 +19,6 @@ pub struct VIPList {
 
 #[near_bindgen]
 impl VIPList {
-
     #[init]
     pub fn new(owner_id: AccountId) -> Self {
         Self {
@@ -43,18 +42,14 @@ impl VIPList {
     }
 
     pub fn vip_allowance(&self, list_id: Option<AccountId>, account_id: AccountId) -> Option<U128> {
-      let list_id = list_id.unwrap_or_else(|| env::predecessor_account_id());
-      self.lists.get(&list_id)
+        let list_id = list_id.unwrap_or_else(|| env::predecessor_account_id());
+        self.lists
+            .get(&list_id)
             .and_then(|list| list.get(&account_id).map(|allowance| (*allowance).into()))
     }
 
-    fn get_current_list_mut(&mut self) -> Option<&mut near_sdk::store::UnorderedMap<AccountId, u128>> {
+    fn get_current_list_mut(&mut self) -> Option<&mut UnorderedMap<AccountId, u128>> {
         let caller = env::predecessor_account_id();
         self.lists.get_mut(&caller)
     }
-
-    fn get_current_list(&self) -> Option<&near_sdk::store::UnorderedMap<AccountId, u128>> {
-      let caller = env::predecessor_account_id();
-      self.lists.get(&caller)
-  }
 }
